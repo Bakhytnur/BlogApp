@@ -46,6 +46,24 @@
       <button @click="goPrev" class="carousel-button prev-button">‹</button>
       <button @click="goNext" class="carousel-button next-button">›</button>
     </div>
+    <!-- New smaller carousel -->
+    <div class="content__small-favourites">
+      <Carousel
+        :items-to-show="5"
+        :wrap-around="true"
+        :autoplay="100"
+        :mouse-drag="true"
+        :transition="1000"
+      >
+        <Slide v-for="(post, index) in picture_posts" :key="index">
+          <img
+            :src="post.image_url"
+            alt="Small Favourite Image"
+            class="small-img"
+          />
+        </Slide>
+      </Carousel>
+    </div>
   </div>
 </template>
 
@@ -324,5 +342,28 @@ export default defineComponent({
 
 .next-button {
   right: 10px;
+}
+
+/* New carousel styles */
+.content__small-favourites {
+  width: 100%;
+  height: 100px;
+  box-sizing: border-box;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px gray solid;
+  position: relative;
+}
+
+.small-img {
+  width: 70%;
+  height: 70%;
+  object-fit: cover;
+}
+
+.carousel__slide {
+  transition: transform 0.1s ease-in-out;
 }
 </style>
