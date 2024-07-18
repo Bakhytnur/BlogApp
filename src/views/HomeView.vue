@@ -35,6 +35,7 @@
     <div class="content__favourites">
       <Carousel
         ref="carouselRef"
+        class="large-carousel"
         :items-to-show="3"
         :wrap-around="true"
         :mouse-drag="true"
@@ -49,6 +50,7 @@
     <!-- New smaller carousel -->
     <div class="content__small-favourites">
       <Carousel
+        class="small-carousel"
         :items-to-show="5"
         :wrap-around="true"
         :autoplay="100"
@@ -262,6 +264,7 @@ export default defineComponent({
   justify-content: flex-start;
   padding: 20px;
   overflow-y: auto;
+  max-width: 800px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -307,8 +310,8 @@ export default defineComponent({
   position: relative;
 }
 
-.carousel,
-.carousel__slide {
+.large-carousel,
+.large-carousel .carousel__slide {
   width: 100%;
   height: 90%;
   display: flex;
@@ -316,7 +319,7 @@ export default defineComponent({
   justify-content: center;
 }
 
-.carousel__slide img {
+.large-carousel .carousel__slide img {
   width: 100%;
   object-fit: cover;
   height: 200px;
@@ -347,7 +350,7 @@ export default defineComponent({
 /* New carousel styles */
 .content__small-favourites {
   width: 100%;
-  height: 100px;
+  height: 70px;
   box-sizing: border-box;
   margin-top: 20px;
   display: flex;
@@ -357,9 +360,25 @@ export default defineComponent({
   position: relative;
 }
 
+.small-carousel,
+.small-carousel .carousel__slide {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.small-carousel .carousel__slide img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
 .small-img {
-  width: 70%;
-  height: 70%;
+  width: 100%;
+  height: 50%;
   object-fit: cover;
 }
 

@@ -85,7 +85,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Scoped styles for AddPicturePost component */
 .add__picture-post {
   max-width: 600px;
   margin: 0 auto;
@@ -110,7 +109,7 @@ export default defineComponent({
 }
 
 input[type='file'] {
-  color: white; /* Цвет текста */
+  color: white;
 }
 
 label {

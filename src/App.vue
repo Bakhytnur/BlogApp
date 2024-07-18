@@ -34,12 +34,17 @@ export default defineComponent({
 .main-content {
   display: flex;
   flex: 1;
+  margin-left: 50px;
+  margin-right: 50px;
 }
 
 .content {
+  display: flex;
   flex: 1;
   overflow-y: auto;
   flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
   /*width: calc(100% - 240px);*/
 }
 </style>

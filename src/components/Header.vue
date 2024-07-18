@@ -96,6 +96,8 @@ export default defineComponent({
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
+  padding-left: 70px;
+  padding-right: 70px;
   box-sizing: border-box;
 }
 

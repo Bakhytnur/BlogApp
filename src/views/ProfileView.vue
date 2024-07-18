@@ -2,7 +2,7 @@
   <div class="profile__view">
     <h1 class="profile__view-header">Profile</h1>
     <div class="profile__view-info" v-if="user">
-      <div v-if="!editing">
+      <div class="profile__view-display-mode" v-if="!editing">
         <p class="profile__view-username">
           <strong>Username:</strong> {{ user.username }}
         </p>
@@ -20,7 +20,7 @@
           Edit
         </button>
       </div>
-      <div v-else>
+      <div class="profile__view-edit-mode" v-else>
         <form @submit.prevent="saveProfile">
           <label for="username">Username:</label>
           <input id="username" v-model="editedUser.username" required />
@@ -122,7 +122,10 @@ export default defineComponent({
 
 <style scoped>
 .profile__view {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
   color: white;
   padding-top: 20px;
 }
@@ -130,6 +133,7 @@ export default defineComponent({
 .profile__view-header {
   font-size: 1.2em;
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 .profile__view-info {
@@ -140,6 +144,13 @@ export default defineComponent({
   padding-right: 30px;
 }
 
+.profile__view-display-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 1rem;
+}
+
 .profile__view-username,
 .profile__view-fullname,
 .profile__view-city,
@@ -148,6 +159,7 @@ export default defineComponent({
   margin: 0.5rem 0;
   display: flex;
   justify-content: space-between;
+  width: 100%;
 }
 
 .profile__view-edit-button {
@@ -157,5 +169,38 @@ export default defineComponent({
   height: 25px;
   width: 70px;
   color: gray;
+  align-self: center;
+}
+
+.profile__view-edit-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile__view-edit-mode label {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.profile__view-edit-mode input,
+.profile__view-edit-mode button {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid gray;
+}
+
+.profile__view-edit-mode button {
+  width: auto;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  margin-right: 20px;
 }
 </style>
