@@ -20,6 +20,7 @@ export interface Post {
   created_at: string;
   like_increment: number;
   liked_by: string[];
+  liked: boolean;
 }
 
 export interface PicturePost {
@@ -28,6 +29,7 @@ export interface PicturePost {
   description: string;
   favourite: boolean;
   like_increment: number;
+  liked: boolean;
 }
 
 export interface FavouritePost {
@@ -40,12 +42,20 @@ export interface FavouritePost {
   like_increment: number;
   image_url?: string;
   description?: string;
+  liked_by?: string[];
+  liked: boolean;
 }
 
 interface State {
   posts: Post[];
   user: User | null;
   token: string | null;
+  hasMorePosts: boolean;
+  pageNumber: number;
+  pageSize: number;
+  hasMorePicturePosts: boolean;
+  picturePageNumber: number;
+  picturePageSize: number;
 }
 
 export default createStore({
@@ -56,12 +66,24 @@ export default createStore({
     favouritePosts: [] as FavouritePost[],
     token: localStorage.getItem('token'),
     searchQuery: '',
-    sortKey: 'title',
-    sortOrder: 'asc',
+    sortKey: 'Sort',
+    sortOrder: 'Order',
+    hasMorePosts: true,
+    pageNumber: 1,
+    pageSize: 10,
+    hasMorePicturePosts: true,
+    picturePageNumber: 1,
+    picturePageSize: 5,
+    hasMoreFavouritePosts: true,
+    favouritePageNumber: 1,
+    favouritePageSize: 5,
   },
   mutations: {
     setPosts(state, posts: Post[]) {
       state.posts = posts;
+    },
+    addPosts(state, posts: Post[]) {
+      state.posts.push(...posts);
     },
     addPost(state, post: Post) {
       state.posts.push(post);
@@ -92,6 +114,12 @@ export default createStore({
     //setUser(state, user: User) {
     //state.user = user;
     //},
+    setHasMorePosts(state, hasMore: boolean) {
+      state.hasMorePosts = hasMore;
+    },
+    incrementPageNumber(state) {
+      state.pageNumber += 1;
+    },
     setUser(state, user: User) {
       state.user = user;
     },
@@ -129,11 +157,13 @@ export default createStore({
         like_increment,
         userId,
         likedByCurrentUser,
+        liked,
       }: {
         id: string;
         like_increment: number;
         userId: string;
         likedByCurrentUser: boolean;
+        liked: boolean;
       },
     ) {
       const post = state.posts.find((post) => post.id === id);
@@ -142,14 +172,19 @@ export default createStore({
       );
       if (post) {
         post.like_increment = like_increment;
+        post.liked = liked;
       }
 
       if (favourite_post) {
         favourite_post.like_increment = like_increment;
+        favourite_post.liked = liked;
       }
     },
     setPicturePosts(state, picturePosts: PicturePost[]) {
       state.picturePosts = picturePosts;
+    },
+    addPicturePosts(state, picturePosts: PicturePost[]) {
+      state.picturePosts.push(...picturePosts);
     },
     addPicturePost(state, picturePost: PicturePost) {
       state.picturePosts.push(picturePost);
@@ -182,6 +217,12 @@ export default createStore({
         (post) => post.id !== picturePostId,
       );
     },
+    setHasMorePicturePosts(state, hasMore: boolean) {
+      state.hasMorePicturePosts = hasMore;
+    },
+    incrementPicturePageNumber(state) {
+      state.picturePageNumber += 1;
+    },
     setPicturePostFavourite(
       state,
       { id, favourite }: { id: string; favourite: boolean },
@@ -193,12 +234,34 @@ export default createStore({
     },
     setPicturePostLikeIncrement(
       state,
-      { id, like_increment }: { id: string; like_increment: number },
+      {
+        id,
+        like_increment,
+        liked,
+      }: { id: string; like_increment: number; liked: boolean },
     ) {
       const post = state.picturePosts.find((post) => post.id === id);
+      const favourite_post = state.favouritePosts.find(
+        (post) => post.id === id,
+      );
+
       if (post) {
         post.like_increment = like_increment;
+        post.liked = liked;
       }
+      if (favourite_post) {
+        favourite_post.like_increment = like_increment;
+        favourite_post.liked = liked;
+      }
+    },
+    addFavouritePosts(state, favouritePosts: FavouritePost[]) {
+      state.favouritePosts.push(...favouritePosts);
+    },
+    setHasMoreFavouritePosts(state, hasMore: boolean) {
+      state.hasMoreFavouritePosts = hasMore;
+    },
+    incrementFavouritePageNumber(state) {
+      state.favouritePageNumber += 1;
     },
     //logout(state) {
     //state.user = null;
@@ -211,8 +274,20 @@ export default createStore({
           headers: {
             Authorization: `Bearer ${state.token}`,
           },
+          params: {
+            page: state.pageNumber,
+            pageSize: state.pageSize,
+          },
         });
-        commit('setPosts', response.data);
+
+        const posts = response.data;
+        if (posts.length < state.pageSize) {
+          commit('setHasMorePosts', false);
+        }
+        commit(state.pageNumber === 1 ? 'setPosts' : 'addPosts', posts);
+        //commit('addPosts', posts);
+        commit('incrementPageNumber');
+        //commit('setPosts', response.data);
       } catch (error) {
         console.error('Error fetching posts:', error);
         if (
@@ -223,6 +298,9 @@ export default createStore({
           // Handle forbidden error, e.g., redirect to login
         }
       }
+    },
+    async fetchMorePosts({ dispatch }) {
+      await dispatch('fetchPosts');
     },
     async addPost({ commit, state }, post: Post) {
       try {
@@ -349,8 +427,9 @@ export default createStore({
         console.log(response);
         commit('setPostLikeIncrement', {
           id,
-          like_increment: newLikeIncrement,
-          //like_increment: response.data.like_increment,
+          //like_increment: newLikeIncrement,
+          like_increment: response.data.like_increment,
+          liked: response.data.liked,
           userId,
           likedByCurrentUser,
         });
@@ -378,10 +457,11 @@ export default createStore({
             },
           },
         );
-        console.log(response);
+        console.log('response', response);
         commit('setPicturePostLikeIncrement', {
           id,
           like_increment: response.data.like_increment,
+          liked: response.data.liked,
         });
       } catch (error) {
         console.error('Error setting like increment:', error);
@@ -395,12 +475,59 @@ export default createStore({
             headers: {
               Authorization: `Bearer ${state.token}`,
             },
+            params: {
+              page: state.picturePageNumber,
+              picturePageSize: state.picturePageSize,
+            },
           },
         );
-        commit('setPicturePosts', response.data);
+
+        console.log('state.picturePageNumber', state.picturePageNumber);
+
+        const picture_posts = response.data;
+        console.log('picture_posts', picture_posts);
+
+        if (picture_posts.length < state.picturePageSize) {
+          commit('setHasMorePicturePosts', false);
+        }
+
+        commit('addPicturePosts', picture_posts);
+        commit('incrementPicturePageNumber');
+
+        //commit('setPicturePosts', response.data);
       } catch (error) {
         console.error('Error fetching picture posts:', error);
       }
+    },
+    async fetchPicturePostsLazy({ commit, state }) {
+      try {
+        const response = await axios.get(
+          'http://localhost:5003/api/pictureposts',
+          {
+            headers: {
+              Authorization: `Bearer ${state.token}`,
+            },
+            params: {
+              page: state.picturePageNumber,
+              picturePageSize: state.picturePageSize,
+            },
+          },
+        );
+        const picture_posts = response.data;
+        if (picture_posts.length < state.picturePageSize) {
+          commit('setHasMorePicturePosts', false);
+        }
+
+        commit('addPicturePosts', picture_posts);
+        commit('incrementPicturePageNumber');
+        console.log('state.picturePageNumber', state.picturePageNumber);
+        //commit('setPicturePosts', response.data);
+      } catch (error) {
+        console.error('Error fetching picture posts:', error);
+      }
+    },
+    async fetchMorePicturePosts({ dispatch }) {
+      await dispatch('fetchPicturePosts');
     },
     async addPicturePost({ commit, state }, picturePost: PicturePost) {
       try {
@@ -458,12 +585,27 @@ export default createStore({
             headers: {
               Authorization: `Bearer ${state.token}`,
             },
+            params: {
+              page: state.favouritePageNumber,
+              favouritePageSize: state.favouritePageSize,
+            },
           },
         );
-        commit('setFavouritePosts', response.data);
+        const favourite_posts = response.data;
+        console.log('favourite_posts', favourite_posts);
+        if (favourite_posts.length < state.favouritePageSize) {
+          commit('setHasMoreFavouritePosts', false);
+        }
+
+        commit('addFavouritePosts', favourite_posts);
+        commit('incrementFavouritePageNumber');
+        //commit('setFavouritePosts', response.data);
       } catch (error) {
         console.error('Error fetching favourite posts:', error);
       }
+    },
+    async fetchMoreFavouritePosts({ dispatch }) {
+      await dispatch('fetchFavouritePosts');
     },
     async register(
       { commit },
@@ -578,7 +720,6 @@ export default createStore({
 
       filteredPosts = filteredPosts.sort((a, b) => {
         const modifier = state.sortOrder === 'asc' ? 1 : -1;
-        // Ensure TypeScript understands that state.sortKey is a valid key of Post
         const key = state.sortKey as keyof Post;
 
         if (a[key] < b[key]) return -1 * modifier;
@@ -607,6 +748,32 @@ export default createStore({
       return filteredPosts;
     },
     //favouritePosts: (state) => state.posts.filter((post) => post.favourite),
-    favouritePosts: (state) => state.favouritePosts,
+    //favouritePosts: (state) => state.favouritePosts,
+    favouritePosts: (state) => {
+      let filteredPosts = state.favouritePosts.filter(
+        (post) =>
+          (post.title ? post.title.toLowerCase() : '').includes(
+            state.searchQuery.toLowerCase(),
+          ) ||
+          (post.body ? post.body.toLowerCase() : '').includes(
+            state.searchQuery.toLowerCase(),
+          ) ||
+          (post.description ? post.description?.toLowerCase() : '').includes(
+            state.searchQuery.toLowerCase(),
+          ),
+      );
+
+      filteredPosts = filteredPosts.sort((a, b) => {
+        const keyA = (a[state.sortKey as keyof FavouritePost] ?? '') as string;
+        const keyB = (b[state.sortKey as keyof FavouritePost] ?? '') as string;
+        if (state.sortOrder === 'asc') {
+          return keyA.localeCompare(keyB);
+        } else {
+          return keyB.localeCompare(keyA);
+        }
+      });
+
+      return filteredPosts;
+    },
   },
 });

@@ -3,19 +3,26 @@
     <h1 class="profile__view-header">Profile</h1>
     <div class="profile__view-info" v-if="user">
       <div class="profile__view-display-mode" v-if="!editing">
-        <p class="profile__view-username">
-          <strong>Username:</strong> {{ user.username }}
-        </p>
-        <p class="profile__view-fullname">
-          <strong>Full Name:</strong> {{ user.fio }}
-        </p>
-        <p class="profile__view-city"><strong>City:</strong> {{ user.city }}</p>
-        <p class="profile__view-address">
-          <strong>Address:</strong> {{ user.address }}
-        </p>
-        <p class="profile__view-dateofbirth">
-          <strong>Date of Birth:</strong> {{ newDate }}
-        </p>
+        <div class="profile__view-row">
+          <span class="profile__view-label">Username:</span>
+          <span>{{ user.username }}</span>
+        </div>
+        <div class="profile__view-row">
+          <span class="profile__view-label">Full Name:</span>
+          <span>{{ user.fio }}</span>
+        </div>
+        <div class="profile__view-row">
+          <span class="profile__view-label">City:</span>
+          <span>{{ user.city }}</span>
+        </div>
+        <div class="profile__view-row">
+          <span class="profile__view-label">Address:</span>
+          <span>{{ user.address }}</span>
+        </div>
+        <div class="profile__view-row">
+          <span class="profile__view-label">Date of Birth:</span>
+          <span>{{ newDate }}</span>
+        </div>
         <button @click="editProfile" class="profile__view-edit-button">
           Edit
         </button>
@@ -125,6 +132,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   width: 100%;
   color: white;
   padding-top: 20px;
@@ -140,26 +148,26 @@ export default defineComponent({
   margin-top: 1rem;
   line-height: 1.6;
   font-size: 1em;
-  padding-left: 30px;
-  padding-right: 30px;
+  width: 60%;
 }
 
 .profile__view-display-mode {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   margin-top: 1rem;
+  width: 100%;
 }
 
-.profile__view-username,
-.profile__view-fullname,
-.profile__view-city,
-.profile__view-address,
-.profile__view-dateofbirth {
-  margin: 0.5rem 0;
+.profile__view-row {
   display: flex;
   justify-content: space-between;
+  margin: 0.5rem 0;
   width: 100%;
+}
+
+.profile__view-label {
+  font-weight: bold;
+  margin-right: 10px;
 }
 
 .profile__view-edit-button {
@@ -194,13 +202,13 @@ export default defineComponent({
 }
 
 .profile__view-edit-mode button {
-  width: auto;
   cursor: pointer;
-  background-color: #007bff;
-  color: white;
+  color: gray;
+  background-color: white;
   border: none;
-  padding: 10px 20px;
   margin-top: 10px;
   margin-right: 20px;
+  height: 25px;
+  width: 70px;
 }
 </style>

@@ -101,6 +101,7 @@ export default defineComponent({
       created_at: '',
       like_increment: 0,
       liked_by: [],
+      liked: false,
     });
     const editingId = ref<string | null>(null);
 
@@ -168,6 +169,7 @@ export default defineComponent({
         created_at: '',
         like_increment: 0,
         liked_by: [],
+        liked: false,
       };
     };
 
@@ -300,7 +302,7 @@ export default defineComponent({
 .content__favourites {
   width: 100%;
   height: 200px;
-  /*background-color: #5778be;*/ /* Placeholder for background color */
+  /*background-color: #5778be;*/
   box-sizing: border-box;
   margin-top: 20px;
   display: flex;
@@ -347,7 +349,6 @@ export default defineComponent({
   right: 10px;
 }
 
-/* New carousel styles */
 .content__small-favourites {
   width: 100%;
   height: 70px;

@@ -11,10 +11,13 @@
             placeholder="Search posts..."
           />
           <select v-model="sortKey" @change="updateSortKey">
+            <option>Sort</option>
             <option value="title">Title</option>
             <option value="body">Body</option>
+            <option value="description">Description</option>
           </select>
           <select v-model="sortOrder" @change="updateSortOrder">
+            <option>Order</option>
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>

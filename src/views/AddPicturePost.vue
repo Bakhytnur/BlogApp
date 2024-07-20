@@ -64,6 +64,7 @@ export default defineComponent({
         description.value = '';
         image.value = null;
         router.push('/pictureposts');
+        //router.push('/');
       } catch (error) {
         console.error('Error adding picture post:', error);
       }
@@ -93,7 +94,6 @@ export default defineComponent({
 
 .add__picture-post-header {
   color: white;
-  margin-top: 50px;
   text-align: center;
 }
 
@@ -121,7 +121,7 @@ input[type='file'],
 textarea {
   width: 100%;
   padding: 10px;
-  border-radius: 3px;
+  border-radius: 5px;
   box-sizing: border-box;
 }
 
@@ -133,12 +133,13 @@ textarea {
 
 .form__actions button {
   margin-left: 10px;
-  padding: 10px 20px;
   border: none;
-  border-radius: 3px;
-  background-color: #007bff;
-  color: #fff;
+  background-color: white;
+  color: gray;
   cursor: pointer;
+  height: 25px;
+  width: 70px;
+  border-radius: 5px;
 }
 
 .form__actions button:hover {

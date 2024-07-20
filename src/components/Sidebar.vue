@@ -31,18 +31,18 @@
         </div>
         <span>Profile</span>
       </router-link>
-      <router-link class="sidebar-links_link" to="/post/new">
+      <router-link class="sidebar-links_link" to="/posts/new">
         <div class="sidebar-links_icon">
           <font-awesome-icon :icon="['fas', 'plus-circle']" />
         </div>
         <span>Add Post</span>
       </router-link>
-      <router-link class="sidebar-links_link" to="/picturepost/new">
+      <!--router-link class="sidebar-links_link" to="/picturepost/new">
         <div class="sidebar-links_icon">
           <font-awesome-icon :icon="['fas', 'plus-circle']" />
         </div>
         <span>Add Picture Post</span>
-      </router-link>
+      </router-link-->
     </div>
   </nav>
 </template>

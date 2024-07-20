@@ -9,6 +9,7 @@ import RegisterView from '@/views/RegisterView.vue';
 import FavouritePosts from '../views/FavouritePosts.vue';
 import PicturePost from '@/views/PicturePost.vue';
 import AddPicturePost from '@/views/AddPicturePost.vue';
+import PostManager from '@/views/PostManager.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -65,6 +66,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/picturepost/new', // Маршрут для AddPicturePost
     name: 'AddPicturePost',
     component: AddPicturePost,
+  },
+  {
+    path: '/posts/new',
+    name: 'NewPosts',
+    component: PostManager,
   },
 ];
 

@@ -24,7 +24,7 @@
                 <font-awesome-icon
                   :icon="['fas', 'heart']"
                   :class="{
-                    liked: post.user_id_likes.includes(currentUser),
+                    liked: post.liked,
                   }"
                 />
                 <p class="post__actions-like-quantity">
@@ -36,8 +36,8 @@
                 :icon="['fas', 'star']"
                 @click="toggleFavourite(post.id, !post.favourite)"
                 :class="{
-                  favourite: post.user_id_favourites.includes(currentUser),
-                  not_favourite: !post.user_id_favourites.includes(currentUser),
+                  favourite: post.favourite,
+                  not_favourite: !post.favourite,
                 }"
               />
               <button @click="startEditing(post.id)">Edit</button>
@@ -63,6 +63,14 @@
         </div>
       </li>
     </ul>
+    <button
+      v-if="hasMorePosts && !loading"
+      @click="loadMorePosts"
+      class="content__load-more-button"
+    >
+      Load More
+    </button>
+    <div v-if="loading" class="content__loading-spinner">Loading...</div>
   </div>
 </template>
 
@@ -84,8 +92,10 @@ export default defineComponent({
       created_at: '',
       like_increment: 0,
       liked_by: [],
+      liked: false,
     });
     const editingId = ref<string | null>(null);
+    const loading = ref(false);
 
     const currentUser = localStorage.getItem('userId') || '';
     console.log(currentUser);
@@ -120,6 +130,16 @@ export default defineComponent({
     //),
     //);
 
+    const hasMorePosts = computed(() => store.state.hasMorePosts);
+
+    const loadMorePosts = async () => {
+      if (!loading.value) {
+        loading.value = true;
+        await store.dispatch('fetchMorePosts');
+        loading.value = false;
+      }
+    };
+
     onMounted(async () => {
       await store.dispatch('fetchPosts');
     });
@@ -143,6 +163,7 @@ export default defineComponent({
         created_at: '',
         like_increment: 0,
         liked_by: [],
+        liked: false,
       };
     };
 
@@ -206,6 +227,9 @@ export default defineComponent({
       toggleFavourite,
       currentUser,
       likedPosts,
+      loading,
+      hasMorePosts,
+      loadMorePosts,
     };
   },
 });
@@ -224,10 +248,14 @@ export default defineComponent({
 }
 
 .content__ul {
-  list-style-type: none; /* Удаляем маркеры списка */
-  padding: 0; /* Убираем внутренние отступы */
-  margin: 0; /* Убираем внешние отступы */
-  width: 100%; /* Ширина списка */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -237,10 +265,10 @@ export default defineComponent({
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px; /* Расстояние между элементами списка */
-  padding: 10px; /* Для отступов вокруг элементов списка */
-  max-width: 1500px; /* Максимальная ширина для элементов списка */
-  box-sizing: border-box; /* Включаем padding и border в общую ширину и высоту элемента */
+  margin-bottom: 10px;
+  padding: 10px;
+  width: 70%;
+  box-sizing: border-box;
 }
 
 .content__li-info {
@@ -257,7 +285,7 @@ export default defineComponent({
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  width: 100%; /* Делаем контейнер шириной 100% */
+  width: 100%;
 }
 
 .post__info {
@@ -270,13 +298,13 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2em; /* Устанавливаем размер иконки */
+  font-size: 2em;
   margin-right: 10px;
   color: white;
 }
 
 .post__info-icon .fa-icon {
-  font-size: 2.5em; /* Увеличение размера иконки */
+  font-size: 2.5em;
   height: 100px;
   display: flex;
   align-items: center;
@@ -306,7 +334,7 @@ input {
 
 .post__actions {
   display: flex;
-  gap: 10px; /* Расстояние между кнопками */
+  gap: 10px;
   align-items: center;
 }
 
@@ -335,8 +363,24 @@ input {
   color: white;
 }
 
+.content__load-more-button {
+  border-radius: 5px;
+  border: none;
+  height: 25px;
+  width: 70px;
+  color: gray;
+}
+
+.content__loading-spinner {
+  border-radius: 5px;
+  border: none;
+  height: 25px;
+  width: 70px;
+  color: gray;
+}
+
 .liked {
-  color: #f00; /* Цвет для "лайкнутой" иконки */
+  color: #f00;
 }
 
 .favourite {

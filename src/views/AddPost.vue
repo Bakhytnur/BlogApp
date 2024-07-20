@@ -40,6 +40,7 @@ export default defineComponent({
       created_at: '',
       like_increment: 0,
       liked_by: [],
+      liked: false,
     });
 
     const handleSubmit = async () => {
@@ -79,8 +80,8 @@ body {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  max-width: 600px;
-  padding: 20px;
+  max-width: 270px;
+  width: 100%;
   background-color: rgb(109, 160, 205);
 }
 
@@ -118,19 +119,21 @@ body {
 
 .post__form-field--button {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
+  justify-content: center;
+  margin-top: 10px;
 }
 
 .post__form-field button {
-  padding: 10px 20px;
-  font-size: 16px;
+  font-size: 14px;
   border: none;
   border-radius: 5px;
-  background-color: #0056b3;
-  color: #fff;
+  background-color: white;
+  color: gray;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  height: 25px;
+  width: 70px;
+  border-radius: 5px;
 }
 
 .post__form-field button:hover {
