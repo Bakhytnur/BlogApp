@@ -38,8 +38,8 @@
             :icon="['fas', 'star']"
             @click="toggleFavourite(post.id, !post.favourite)"
             :class="{
-              favourite: post.favourite,
-              not_favourite: !post.favourite,
+              favourite: post.marked_favourite,
+              not_favourite: !post.marked_favourite,
             }"
           />
           <button @click="startEditing(post.id)">Edit</button>
@@ -184,6 +184,7 @@ export default defineComponent({
       console.log('id', id, 'favourite', favourite);
       await store.dispatch('setFavouritePicture', { id, favourite });
       await store.dispatch('fetchPicturePosts');
+      await store.dispatch('fetchFavouritePostsMain');
     };
 
     return {

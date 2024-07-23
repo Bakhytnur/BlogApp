@@ -21,6 +21,7 @@ export interface Post {
   like_increment: number;
   liked_by: string[];
   liked: boolean;
+  marked_favourite: boolean;
 }
 
 export interface PicturePost {
@@ -30,6 +31,7 @@ export interface PicturePost {
   favourite: boolean;
   like_increment: number;
   liked: boolean;
+  marked_favourite: boolean;
 }
 
 export interface FavouritePost {
@@ -101,8 +103,12 @@ export default createStore({
         //state.posts.splice(index, 1, updatedPost);
         state.favouritePosts[index2] = {
           ...state.favouritePosts[index2],
+          //...state.posts[index2],
           ...updatedPost,
         };
+        state.favouritePosts = state.favouritePosts.filter(
+          (post) => post.id !== updatedPost.id,
+        );
       }
     },
     deletePost(state, postId: string) {
@@ -144,10 +150,18 @@ export default createStore({
     setFavouritePosts(state, favouritePosts) {
       state.favouritePosts = favouritePosts;
     },
-    setFavourite(state, { id, favourite }: { id: string; favourite: boolean }) {
+    setFavourite(
+      state,
+      {
+        id,
+        favourite,
+        marked_favourite,
+      }: { id: string; favourite: boolean; marked_favourite: boolean },
+    ) {
       const post = state.posts.find((post) => post.id === id);
       if (post) {
         post.favourite = favourite;
+        post.marked_favourite = marked_favourite;
       }
     },
     setPostLikeIncrement(
@@ -203,10 +217,15 @@ export default createStore({
           ...state.picturePosts[index],
           ...updatedPicturePost,
         };
+      }
+      if (index2 !== -1) {
         state.favouritePosts[index2] = {
-          ...state.picturePosts[index2],
+          ...state.favouritePosts[index2],
           ...updatedPicturePost,
         };
+        state.favouritePosts = state.favouritePosts.filter(
+          (post) => post.id !== updatedPicturePost.id,
+        );
       }
     },
     deletePicturePost(state, picturePostId: string) {
@@ -225,11 +244,16 @@ export default createStore({
     },
     setPicturePostFavourite(
       state,
-      { id, favourite }: { id: string; favourite: boolean },
+      {
+        id,
+        favourite,
+        marked_favourite,
+      }: { id: string; favourite: boolean; marked_favourite: boolean },
     ) {
       const post = state.picturePosts.find((post) => post.id === id);
       if (post) {
         post.favourite = favourite;
+        post.marked_favourite = marked_favourite;
       }
     },
     setPicturePostLikeIncrement(
@@ -284,8 +308,8 @@ export default createStore({
         if (posts.length < state.pageSize) {
           commit('setHasMorePosts', false);
         }
-        commit(state.pageNumber === 1 ? 'setPosts' : 'addPosts', posts);
-        //commit('addPosts', posts);
+        //commit(state.pageNumber === 1 ? 'setPosts' : 'addPosts', posts);
+        commit('addPosts', posts);
         commit('incrementPageNumber');
         //commit('setPosts', response.data);
       } catch (error) {
@@ -347,7 +371,7 @@ export default createStore({
       }
     },
     async setFavourite(
-      { commit, state },
+      { commit, dispatch, state },
       { id, favourite }: { id: string; favourite: boolean },
     ) {
       try {
@@ -365,14 +389,23 @@ export default createStore({
           },
         );
         console.log('response', response);
-        commit('setFavourite', { id, favourite });
-        //commit('updatePost', { id, favourite: response.data.favourite });
+        //commit('setFavourite', {
+        //id,
+        //favourite
+        //});
+        commit('updatePost', {
+          id,
+          favourite: response.data.favourite,
+          marked_favourite: response.data.marked_favourite,
+        });
+
+        await dispatch('fetchFavouritePosts');
       } catch (error) {
         console.error('Error setting favourite:', error);
       }
     },
     async setFavouritePicture(
-      { commit, state },
+      { commit, dispatch, state },
       { id, favourite }: { id: string; favourite: boolean },
     ) {
       try {
@@ -391,7 +424,13 @@ export default createStore({
         );
         console.log('response', response);
         //commit('setPicturePostFavourite', { id, favourite });
-        commit('updatePicturePost', { id, favourite: response.data.favourite });
+        commit('updatePicturePost', {
+          id,
+          favourite: response.data.favourite,
+          marked_favourite: response.data.marked_favourite,
+        });
+
+        await dispatch('fetchFavouritePosts');
       } catch (error) {
         console.error('Error setting favourite:', error);
       }
@@ -499,33 +538,6 @@ export default createStore({
         console.error('Error fetching picture posts:', error);
       }
     },
-    async fetchPicturePostsLazy({ commit, state }) {
-      try {
-        const response = await axios.get(
-          'http://localhost:5003/api/pictureposts',
-          {
-            headers: {
-              Authorization: `Bearer ${state.token}`,
-            },
-            params: {
-              page: state.picturePageNumber,
-              picturePageSize: state.picturePageSize,
-            },
-          },
-        );
-        const picture_posts = response.data;
-        if (picture_posts.length < state.picturePageSize) {
-          commit('setHasMorePicturePosts', false);
-        }
-
-        commit('addPicturePosts', picture_posts);
-        commit('incrementPicturePageNumber');
-        console.log('state.picturePageNumber', state.picturePageNumber);
-        //commit('setPicturePosts', response.data);
-      } catch (error) {
-        console.error('Error fetching picture posts:', error);
-      }
-    },
     async fetchMorePicturePosts({ dispatch }) {
       await dispatch('fetchPicturePosts');
     },
@@ -606,6 +618,23 @@ export default createStore({
     },
     async fetchMoreFavouritePosts({ dispatch }) {
       await dispatch('fetchFavouritePosts');
+    },
+    async fetchFavouritePostsMain({ commit, state }) {
+      try {
+        const userId = localStorage.getItem('userId');
+        const response = await axios.get(
+          'http://localhost:5003/api/favouritepostsmain',
+          {
+            headers: {
+              Authorization: `Bearer ${state.token}`,
+            },
+          },
+        );
+
+        commit('setFavouritePosts', response.data);
+      } catch (error) {
+        console.error('Error fetching favourite posts:', error);
+      }
     },
     async register(
       { commit },

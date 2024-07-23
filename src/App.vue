@@ -4,7 +4,9 @@
     <div class="main-content">
       <Sidebar />
       <div class="content">
-        <router-view />
+        <keep-alive include="PostView, PicturePost">
+          <router-view />
+        </keep-alive>
       </div>
     </div>
   </div>

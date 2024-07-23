@@ -13,17 +13,17 @@
         </div>
         <span>Posts</span>
       </router-link>
-      <router-link class="sidebar-links_link" to="/favourites">
-        <div class="sidebar-links_icon">
-          <font-awesome-icon :icon="['fas', 'star']" />
-        </div>
-        <span>Favourite Posts</span>
-      </router-link>
       <router-link class="sidebar-links_link" to="/pictureposts">
         <div class="sidebar-links_icon">
           <font-awesome-icon :icon="['fas', 'star']" />
         </div>
         <span>Picture Posts</span>
+      </router-link>
+      <router-link class="sidebar-links_link" to="/favourites">
+        <div class="sidebar-links_icon">
+          <font-awesome-icon :icon="['fas', 'star']" />
+        </div>
+        <span>Favourite Posts</span>
       </router-link>
       <router-link class="sidebar-links_link" to="/profile">
         <div class="sidebar-links_icon">

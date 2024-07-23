@@ -36,8 +36,8 @@
                 :icon="['fas', 'star']"
                 @click="toggleFavourite(post.id, !post.favourite)"
                 :class="{
-                  favourite: post.favourite,
-                  not_favourite: !post.favourite,
+                  favourite: post.marked_favourite,
+                  not_favourite: !post.marked_favourite,
                 }"
               />
               <button @click="startEditing(post.id)">Edit</button>
@@ -93,6 +93,7 @@ export default defineComponent({
       like_increment: 0,
       liked_by: [],
       liked: false,
+      marked_favourite: false,
     });
     const editingId = ref<string | null>(null);
     const loading = ref(false);
@@ -164,6 +165,7 @@ export default defineComponent({
         like_increment: 0,
         liked_by: [],
         liked: false,
+        marked_favourite: false,
       };
     };
 
@@ -209,6 +211,7 @@ export default defineComponent({
       console.log('id', id, 'favourite', favourite);
       await store.dispatch('setFavourite', { id, favourite });
       await store.dispatch('fetchPosts');
+      await store.dispatch('fetchFavouritePostsMain');
     };
 
     const isEditing = (id: string) => editingId.value === id;

@@ -41,6 +41,7 @@ export default defineComponent({
       like_increment: 0,
       liked_by: [],
       liked: false,
+      marked_favourite: false,
     });
 
     const handleSubmit = async () => {

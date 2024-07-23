@@ -34,8 +34,8 @@
                   :icon="['fas', 'star']"
                   @click="toggleFavourite(post.id, !post.favourite)"
                   :class="{
-                    favourite: post.favourite,
-                    not_favourite: !post.favourite,
+                    favourite: post.marked_favourite,
+                    not_favourite: !post.marked_favourite,
                   }"
                 />
                 <button @click="startEditing(post.id)">Edit</button>
@@ -105,8 +105,8 @@
                 :icon="['fas', 'star']"
                 @click="toggleFavouritePicturePost(post.id, !post.favourite)"
                 :class="{
-                  favourite: post.favourite,
-                  not_favourite: !post.favourite,
+                  favourite: post.marked_favourite,
+                  not_favourite: !post.marked_favourite,
                 }"
               />
               <button @click="startEditingPicturePost(post.id)">Edit</button>
@@ -145,6 +145,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref, computed } from 'vue';
+import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useStore } from 'vuex';
 import { Post, PicturePost } from '@/store';
 
@@ -162,6 +163,7 @@ export default defineComponent({
       like_increment: 0,
       liked_by: [],
       liked: false,
+      marked_favourite: false,
     });
     const editingId = ref<string | null>(null);
 
@@ -183,9 +185,13 @@ export default defineComponent({
       }
     };
 
+    const loadFavouritePosts = async () => {
+      await store.dispatch('fetchFavouritePostsMain');
+    };
+
     onMounted(async () => {
-      await store.dispatch('fetchPosts');
-      await store.dispatch('fetchPicturePosts');
+      //await store.dispatch('fetchPosts');
+      //await store.dispatch('fetchPicturePosts');
       await store.dispatch('fetchFavouritePosts');
     });
 
@@ -209,6 +215,7 @@ export default defineComponent({
         like_increment: 0,
         liked_by: [],
         liked: false,
+        marked_favourite: false,
       };
     };
 
