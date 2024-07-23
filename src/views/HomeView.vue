@@ -102,6 +102,7 @@ export default defineComponent({
       like_increment: 0,
       liked_by: [],
       liked: false,
+      marked_favourite: false,
     });
     const editingId = ref<string | null>(null);
 
@@ -170,6 +171,7 @@ export default defineComponent({
         like_increment: 0,
         liked_by: [],
         liked: false,
+        marked_favourite: false,
       };
     };
 
